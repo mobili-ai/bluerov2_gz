@@ -57,6 +57,12 @@
     </include>
 
     <include>
+      <uri>model://bluerov2_dummy</uri>
+      <name>bluerov2_leader</name>
+      <pose>5 0 -2 0 0 0</pose>
+    </include>
+
+    <include>
       <uri>model://axes</uri>
       <pose>0 0 0.2 0 0 0</pose>
     </include>
