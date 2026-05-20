@@ -78,7 +78,7 @@
       <nRabsR>-4.0</nRabsR>
     </plugin>
 
-    <include>
+    <!-- <include>
       <uri>model://camera</uri>
       <name>camera</name>
       <pose>0.21 0 0.05 0 0 0</pose>
@@ -87,7 +87,7 @@
     <joint name="camera_fixed_joint" type="fixed">
       <parent>base_link</parent>
       <child>camera::base_link</child>
-    </joint>
+    </joint> -->
 
     <include>
       <uri>model://segmentation_camera</uri>
@@ -97,7 +97,7 @@
 
     <joint name="segmentation_camera_fixed_joint" type="fixed">
       <parent>base_link</parent>
-      <child>segmentation_camera::link</child>
+      <child>segmentation_camera::base_link</child>
     </joint>
 
     <link name="thruster1">
