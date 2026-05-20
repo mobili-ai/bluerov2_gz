@@ -64,7 +64,7 @@
     <include>
       <uri>model://bluerov2_dummy</uri>
       <name>bluerov2_leader</name>
-      <pose>5 0 -2 0 0 0</pose>
+      <pose>6.0 0 -2 0 0 0</pose>
       <plugin filename="gz-sim-label-system" name="gz::sim::systems::Label">
         <label>255</label>
       </plugin>
