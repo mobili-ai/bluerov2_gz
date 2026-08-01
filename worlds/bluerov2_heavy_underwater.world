@@ -35,7 +35,7 @@
       <graded_buoyancy>
         <default_density>1000</default_density>
         <density_change>
-          <above_depth>0.125</above_depth>
+          <above_depth>0.0</above_depth>
           <density>1</density>
         </density_change>
       </graded_buoyancy>
@@ -48,6 +48,14 @@
       <uri>https://fuel.gazebosim.org/1.0/OpenRobotics/models/Sun</uri>
     </include>
 
+
+    <include>
+      <uri>model://ground_plane</uri>
+      <pose>0 0 0.1 3.14 0 0</pose>
+    </include>
+
+
+
     <include>
       <uri>model://sand_heightmap</uri>
       <pose>0 7 -10 0 0 0</pose>
@@ -55,6 +63,7 @@
         <label>200</label>
       </plugin>
     </include>
+
 
     <include>
       <uri>model://bluerov2_heavy</uri>
