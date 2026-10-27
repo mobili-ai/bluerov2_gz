@@ -1,0 +1,62 @@
+# Torpedo AUV: 1.536 m long, 135.63 mm diameter hull, rounded nose (+x),
+# pointed tail. Origin is the hull midpoint (768 mm from either tip).
+#
+# Mass, CG/CB, inertia, drag and added mass are ESTIMATES from the hull
+# geometry (uniform-density cylinder, slender-body theory). Replace with
+# measured / CAD values when available.
+model_name: "torpedo"
+mass: 20.0
+fluid_density: 1000.0
+control_method: 0
+# x is the equivalent cylinder length after accounting for the nose and tail
+# taper; y/z are the hull diameter. Only used to size the buoyancy volume.
+bounding_box:
+  x: 1.40
+  y: 0.1356
+  z: 0.1356
+center_of_mass:
+  x: 0.0
+  y: 0.0
+  z: 0.0
+# CB 10 mm above CG gives passive roll/pitch stability (roll is not actuated)
+center_of_volume:
+  x: 0.0
+  y: 0.0
+  z: 0.01
+# ~1% positive buoyancy
+buoyancy_adjustment: 0.2
+inertia:
+  ixx: 0.05
+  iyy: 3.95
+  izz: 3.95
+drag:
+  linear:
+    xU: -2.0
+    yV: -10.0
+    zW: -10.0
+    kP: -0.5
+    mQ: -2.0
+    nR: -2.0
+  quadratic:
+    # hull (Cd 0.3) + 2 T200 pods + crossbar frontal drag
+    xUabsU: -13.0
+    yVabsV: -105.0
+    zWabsW: -110.0
+    kPabsP: -1.0
+    mQabsQ: -12.0
+    nRabsR: -12.0
+# Added mass is set as <fluid_added_mass> in model.sdf.in, not via the
+# Hydrodynamics plugin (added_mass here defaults to 0).
+thrusters:
+  - x: -0.533 # Thruster 1: starboard horizontal (235 mm from tail tip, 330 mm span)
+    y: -0.165
+    z: 0.0
+  - x: -0.533 # Thruster 2: port horizontal
+    y: 0.165
+    z: 0.0
+  - x: 0.5648 # Thruster 3: bow vertical (203.2 mm from nose tip)
+    y: 0.0
+    z: 0.0
+  - x: -0.5902 # Thruster 4: stern vertical (177.8 mm from tail tip)
+    y: 0.0
+    z: 0.0

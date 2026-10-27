@@ -1,0 +1,435 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<sdf version="1.11">
+  <model name=@model_name>
+    <pose>0 0 0 0 0 0</pose>
+
+    <!-- Body frame: x forward (rounded nose), y port, z up. Origin at hull midpoint.
+         ArduSub FRAME_CONFIG 7 (TORPEDO) motor order:
+           1 starboard horizontal, 2 port horizontal, 3 bow vertical, 4 stern vertical -->
+
+    <link name="base_link">
+      <inertial>
+        <pose>@center_of_mass_x @center_of_mass_y @center_of_mass_z 0 0 0</pose>
+        <mass>@mass</mass>
+        <inertia>
+          <ixx>@ixx</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>@iyy</iyy>
+          <iyz>0</iyz>
+          <izz>@izz</izz>
+        </inertia>
+        <!-- Slender-body estimate. Set here (solved implicitly by the physics engine)
+             rather than in the Hydrodynamics plugin, which goes unstable when the
+             added mass is comparable to the vehicle mass. -->
+        <fluid_added_mass>
+          <xx>2.0</xx>
+          <yy>20.0</yy>
+          <zz>20.0</zz>
+          <pp>0.0</pp>
+          <qq>3.3</qq>
+          <rr>3.3</rr>
+        </fluid_added_mass>
+      </inertial>
+
+      <!-- Hull: cylinder from the start of the tail taper to the nose hemisphere -->
+      <visual name="hull_visual">
+        <pose>0.041 0 0 0 @d90 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.0678</radius>
+            <length>1.318</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <ambient>0.3 0.3 0.3 1</ambient>
+          <diffuse>0.35 0.35 0.33 1</diffuse>
+        </material>
+      </visual>
+      <visual name="nose_visual">
+        <pose>0.700 0 0 0 0 0</pose>
+        <geometry>
+          <sphere>
+            <radius>0.0678</radius>
+          </sphere>
+        </geometry>
+        <material>
+          <ambient>0.3 0.3 0.3 1</ambient>
+          <diffuse>0.35 0.35 0.33 1</diffuse>
+        </material>
+      </visual>
+      <!-- Tail taper approximated with stepped cylinders -->
+      <visual name="tail1_visual">
+        <pose>-0.643 0 0 0 @d90 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.056</radius>
+            <length>0.05</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <ambient>0.3 0.3 0.3 1</ambient>
+          <diffuse>0.35 0.35 0.33 1</diffuse>
+        </material>
+      </visual>
+      <visual name="tail2_visual">
+        <pose>-0.693 0 0 0 @d90 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.040</radius>
+            <length>0.05</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <ambient>0.3 0.3 0.3 1</ambient>
+          <diffuse>0.35 0.35 0.33 1</diffuse>
+        </material>
+      </visual>
+      <visual name="tail3_visual">
+        <pose>-0.743 0 0 0 @d90 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.022</radius>
+            <length>0.05</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <ambient>0.3 0.3 0.3 1</ambient>
+          <diffuse>0.35 0.35 0.33 1</diffuse>
+        </material>
+      </visual>
+      <!-- Crossbar carrying the horizontal thrusters -->
+      <visual name="crossbar_visual">
+        <pose>@thruster1_x 0 0 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.02 0.33 0.015</size>
+          </box>
+        </geometry>
+        <material>
+          <ambient>0.1 0.1 0.1 1</ambient>
+          <diffuse>0.1 0.1 0.1 1</diffuse>
+        </material>
+      </visual>
+      <visual name="thruster1_housing_visual">
+        <pose>@thruster1_x @thruster1_y @thruster1_z 0 @d90 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.05</radius>
+            <length>0.11</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <ambient>0.1 0.1 0.1 1</ambient>
+          <diffuse>0.1 0.1 0.1 1</diffuse>
+        </material>
+      </visual>
+      <visual name="thruster2_housing_visual">
+        <pose>@thruster2_x @thruster2_y @thruster2_z 0 @d90 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.05</radius>
+            <length>0.11</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <ambient>0.1 0.1 0.1 1</ambient>
+          <diffuse>0.1 0.1 0.1 1</diffuse>
+        </material>
+      </visual>
+
+      <!-- Collision volume * fluid_density == displaced mass, used by BuoyancyPlugin -->
+      <collision name="base_link_collision">
+        <pose>@center_of_volume_x @center_of_volume_y @center_of_volume_z 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>@collision_x @collision_y @collision_z</size>
+          </box>
+        </geometry>
+      </collision>
+
+      <!-- IMU sensor gyro and accel data will be sent to ArduSub -->
+      <sensor name="imu_sensor" type="imu">
+        <!-- Transform from the Gazebo body frame (x-forward, y-left, z-up)
+             to the ArduPilot body frame (x-forward, y-right, z-down) -->
+        <pose>0 0 0 @d180 0 0</pose>
+        <always_on>1</always_on>
+        <update_rate>1000.0</update_rate>
+      </sensor>
+    </link>
+
+    <!-- Hydrodynamics plugin -->
+    <plugin
+        filename="gz-sim-hydrodynamics-system"
+        name="gz::sim::systems::Hydrodynamics">
+      <link_name>base_link</link_name>
+      <water_density>@fluid_density</water_density>
+      <!-- Added mass: -->
+      <xDotU>@xDotU</xDotU>
+      <yDotV>@yDotV</yDotV>
+      <zDotW>@zDotW</zDotW>
+      <kDotP>@kDotP</kDotP>
+      <mDotQ>@mDotQ</mDotQ>
+      <nDotR>@nDotR</nDotR>
+      <!-- First order stability derivative: -->
+      <xU>@xU</xU>
+      <yV>@yV</yV>
+      <zW>@zW</zW>
+      <kP>@kP</kP>
+      <mQ>@mQ</mQ>
+      <nR>@nR</nR>
+      <!-- Second order stability derivative: -->
+      <xUabsU>@xUabsU</xUabsU>
+      <yVabsV>@yVabsV</yVabsV>
+      <zWabsW>@zWabsW</zWabsW>
+      <kPabsP>@kPabsP</kPabsP>
+      <mQabsQ>@mQabsQ</mQabsQ>
+      <nRabsR>@nRabsR</nRabsR>
+    </plugin>
+
+    <!-- Thruster links: the joint axis is -z of the link, positive command pushes along it.
+         Horizontal thrusters are pitched -90 deg so a positive command pushes forward (+x).
+         Vertical thrusters are unrotated so a positive command pushes down (-z). -->
+
+    <link name="thruster1">
+      <pose>@thruster1_x @thruster1_y @thruster1_z 0 -@d90 0</pose>
+      <visual name="thruster_prop_visual">
+        <pose>0 0 0 -@d90 0 @d90</pose>
+        <geometry>
+          <mesh>
+            <uri>model://bluerov2/meshes/t200_ccw_prop.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <inertial>
+        <mass>@propeller_mass</mass>
+        <inertia>
+          <ixx>@propeller_ixx</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>@propeller_iyy</iyy>
+          <iyz>0</iyz>
+          <izz>@propeller_izz</izz>
+        </inertia>
+      </inertial>
+    </link>
+
+    <link name="thruster2">
+      <pose>@thruster2_x @thruster2_y @thruster2_z 0 -@d90 0</pose>
+      <visual name="thruster_prop_visual">
+        <pose>0 0 0 @d90 0 @d90</pose>
+        <geometry>
+          <mesh>
+            <uri>model://bluerov2/meshes/t200_cw_prop.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <inertial>
+        <mass>@propeller_mass</mass>
+        <inertia>
+          <ixx>@propeller_ixx</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>@propeller_iyy</iyy>
+          <iyz>0</iyz>
+          <izz>@propeller_izz</izz>
+        </inertia>
+      </inertial>
+    </link>
+
+    <link name="thruster3">
+      <pose>@thruster3_x @thruster3_y @thruster3_z 0 0 0</pose>
+      <visual name="thruster_prop_visual">
+        <pose>0 0 0 -@d90 0 @d90</pose>
+        <geometry>
+          <mesh>
+            <uri>model://bluerov2/meshes/t200_ccw_prop.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <inertial>
+        <mass>@propeller_mass</mass>
+        <inertia>
+          <ixx>@propeller_ixx</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>@propeller_iyy</iyy>
+          <iyz>0</iyz>
+          <izz>@propeller_izz</izz>
+        </inertia>
+      </inertial>
+    </link>
+
+    <link name="thruster4">
+      <pose>@thruster4_x @thruster4_y @thruster4_z 0 0 0</pose>
+      <visual name="thruster_prop_visual">
+        <pose>0 0 0 @d90 0 @d90</pose>
+        <geometry>
+          <mesh>
+            <uri>model://bluerov2/meshes/t200_cw_prop.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <inertial>
+        <mass>@propeller_mass</mass>
+        <inertia>
+          <ixx>@propeller_ixx</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>@propeller_iyy</iyy>
+          <iyz>0</iyz>
+          <izz>@propeller_izz</izz>
+        </inertia>
+      </inertial>
+    </link>
+
+    <joint name="thruster1_joint" type="revolute">
+      <parent>base_link</parent>
+      <child>thruster1</child>
+      <axis>
+        <xyz>0 0 -1</xyz>
+      </axis>
+    </joint>
+
+    <joint name="thruster2_joint" type="revolute">
+      <parent>base_link</parent>
+      <child>thruster2</child>
+      <axis>
+        <xyz>0 0 -1</xyz>
+      </axis>
+    </joint>
+
+    <joint name="thruster3_joint" type="revolute">
+      <parent>base_link</parent>
+      <child>thruster3</child>
+      <axis>
+        <xyz>0 0 -1</xyz>
+      </axis>
+    </joint>
+
+    <joint name="thruster4_joint" type="revolute">
+      <parent>base_link</parent>
+      <child>thruster4</child>
+      <axis>
+        <xyz>0 0 -1</xyz>
+      </axis>
+    </joint>
+
+    <plugin
+        filename="gz-sim-thruster-system"
+        name="gz::sim::systems::Thruster">
+      <namespace>torpedo</namespace>
+      <joint_name>thruster1_joint</joint_name>
+      <thrust_coefficient>@thrust_coefficient</thrust_coefficient>
+      <fluid_density>@fluid_density</fluid_density>
+      <propeller_diameter>@propeller_diameter</propeller_diameter>
+      <velocity_control>true</velocity_control>
+      <use_angvel_cmd>@use_angvel_cmd</use_angvel_cmd>
+    </plugin>
+
+    <plugin
+        filename="gz-sim-thruster-system"
+        name="gz::sim::systems::Thruster">
+      <namespace>torpedo</namespace>
+      <joint_name>thruster2_joint</joint_name>
+      <!-- Reverse spin to balance torque -->
+      <thrust_coefficient>-@thrust_coefficient</thrust_coefficient>
+      <fluid_density>@fluid_density</fluid_density>
+      <propeller_diameter>@propeller_diameter</propeller_diameter>
+      <velocity_control>true</velocity_control>
+      <use_angvel_cmd>@use_angvel_cmd</use_angvel_cmd>
+    </plugin>
+
+    <plugin
+        filename="gz-sim-thruster-system"
+        name="gz::sim::systems::Thruster">
+      <namespace>torpedo</namespace>
+      <joint_name>thruster3_joint</joint_name>
+      <thrust_coefficient>@thrust_coefficient</thrust_coefficient>
+      <fluid_density>@fluid_density</fluid_density>
+      <propeller_diameter>@propeller_diameter</propeller_diameter>
+      <velocity_control>true</velocity_control>
+      <use_angvel_cmd>@use_angvel_cmd</use_angvel_cmd>
+    </plugin>
+
+    <plugin
+        filename="gz-sim-thruster-system"
+        name="gz::sim::systems::Thruster">
+      <namespace>torpedo</namespace>
+      <joint_name>thruster4_joint</joint_name>
+      <!-- Reverse spin to balance torque -->
+      <thrust_coefficient>-@thrust_coefficient</thrust_coefficient>
+      <fluid_density>@fluid_density</fluid_density>
+      <propeller_diameter>@propeller_diameter</propeller_diameter>
+      <velocity_control>true</velocity_control>
+      <use_angvel_cmd>@use_angvel_cmd</use_angvel_cmd>
+    </plugin>
+
+    <plugin
+        filename="gz-sim-odometry-publisher-system"
+        name="gz::sim::systems::OdometryPublisher">
+      <odom_frame>world</odom_frame>
+      <robot_base_frame>torpedo</robot_base_frame>
+      <dimensions>3</dimensions>
+    </plugin>
+
+    <plugin name="ArduPilotPlugin" filename="libArduPilotPlugin.so">
+      <!-- Port settings -->
+      <fdm_addr>127.0.0.1</fdm_addr>
+      <fdm_port_in>9002</fdm_port_in>
+      <connectionTimeoutMaxCount>5</connectionTimeoutMaxCount>
+      <lock_step>1</lock_step>
+
+      <!-- Transform from the Gazebo body frame (x-forward, y-left, z-up)
+           to the ArduPilot body frame (x-forward, y-right, z-down) -->
+      <modelXYZToAirplaneXForwardZDown>0 0 0 @d180 0 0</modelXYZToAirplaneXForwardZDown>
+
+      <!-- Transform from the Gazebo world frame (ENU)
+           to the ArduPilot world frame (NED) -->
+      <gazeboXYZToNED>0 0 0 @d180 0 @d90</gazeboXYZToNED>
+
+      <!-- Sensors -->
+      <imuName>imu_sensor</imuName>
+
+      <!-- Thrusters -->
+      <control channel="0">
+        <jointName>thruster1_joint</jointName>
+        <servo_min>@servo_min</servo_min>
+        <servo_max>@servo_max</servo_max>
+        <type>COMMAND</type>
+        <cmd_topic>@thruster1_topic</cmd_topic>
+        <offset>@control_offset</offset>
+        <multiplier>@ccw_control_multiplier</multiplier>
+      </control>
+      <control channel="1">
+        <jointName>thruster2_joint</jointName>
+        <servo_min>@servo_min</servo_min>
+        <servo_max>@servo_max</servo_max>
+        <type>COMMAND</type>
+        <cmd_topic>@thruster2_topic</cmd_topic>
+        <offset>@control_offset</offset>
+        <multiplier>@cw_control_multiplier</multiplier>
+      </control>
+      <control channel="2">
+        <jointName>thruster3_joint</jointName>
+        <servo_min>@servo_min</servo_min>
+        <servo_max>@servo_max</servo_max>
+        <type>COMMAND</type>
+        <cmd_topic>@thruster3_topic</cmd_topic>
+        <offset>@control_offset</offset>
+        <multiplier>@ccw_control_multiplier</multiplier>
+      </control>
+      <control channel="3">
+        <jointName>thruster4_joint</jointName>
+        <servo_min>@servo_min</servo_min>
+        <servo_max>@servo_max</servo_max>
+        <type>COMMAND</type>
+        <cmd_topic>@thruster4_topic</cmd_topic>
+        <offset>@control_offset</offset>
+        <multiplier>@cw_control_multiplier</multiplier>
+      </control>
+
+    </plugin>
+
+  </model>
+</sdf>
