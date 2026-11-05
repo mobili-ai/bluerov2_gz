@@ -70,6 +70,9 @@
       <pose>3 4 -0.5 0 0 1.57</pose>
     </include>
 
+
+
+
     <include>
       <uri>model://bluerov2_dummy</uri>
       <name>bluerov2_leader</name>
@@ -96,6 +99,128 @@
         <label>255</label>
       </plugin>
     </include> -->
+
+
+
+    <!-- Static wall: 20 m long (along y), 0.3 m thick, from the seabed (z=-10) to 0.5 m above the surface -->
+    <model name="small_side_wall">
+      <static>true</static>
+      <pose>6.38 4.95 -2.28 1.57 0 0.6580</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>16 4 0.25</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>16 4 0.25</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.5 0.5 0.5 1</ambient>
+            <diffuse>0.6 0.6 0.6 1</diffuse>
+            <specular>0.1 0.1 0.1 1</specular>
+          </material>
+        </visual>
+      </link>
+      <plugin filename="gz-sim-label-system" name="gz::sim::systems::Label">
+        <label>100</label>
+      </plugin>
+    </model>
+
+    <!-- 21 m wall, perpendicular to small_side_wall at its far end (12.71, 9.84); outer corner flush -->
+    <model name="long_side_wall">
+      <static>true</static>
+      <pose>6.266 17.975 -2.28 1.57 0 2.2288</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>21 4 0.25</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>21 4 0.25</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.5 0.5 0.5 1</ambient>
+            <diffuse>0.6 0.6 0.6 1</diffuse>
+            <specular>0.1 0.1 0.1 1</specular>
+          </material>
+        </visual>
+      </link>
+      <plugin filename="gz-sim-label-system" name="gz::sim::systems::Label">
+        <label>100</label>
+      </plugin>
+    </model>
+
+    <!-- 21 m wall, perpendicular to small_side_wall at its other end (0.05, 0.06), parallel to long_side_wall; outer corner flush -->
+    <model name="long_side_wall_2">
+      <static>true</static>
+      <pose>-6.196 8.343 -2.28 1.57 0 2.2288</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>21 4 0.25</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>21 4 0.25</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.5 0.5 0.5 1</ambient>
+            <diffuse>0.6 0.6 0.6 1</diffuse>
+            <specular>0.1 0.1 0.1 1</specular>
+          </material>
+        </visual>
+      </link>
+      <plugin filename="gz-sim-label-system" name="gz::sim::systems::Label">
+        <label>100</label>
+      </plugin>
+    </model>
+
+    <!-- 16 m wall, parallel to small_side_wall, closing the far ends of long_side_wall and long_side_wall_2; outer corners flush -->
+    <model name="small_side_wall_2">
+      <static>true</static>
+      <pose>-6.309 21.368 -2.28 1.57 0 0.6580</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>16 4 0.25</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>16 4 0.25</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.5 0.5 0.5 1</ambient>
+            <diffuse>0.6 0.6 0.6 1</diffuse>
+            <specular>0.1 0.1 0.1 1</specular>
+          </material>
+        </visual>
+      </link>
+      <plugin filename="gz-sim-label-system" name="gz::sim::systems::Label">
+        <label>100</label>
+      </plugin>
+    </model>
 
     <include>
       <uri>model://axes</uri>
