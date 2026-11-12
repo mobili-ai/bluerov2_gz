@@ -1,5 +1,6 @@
 # Torpedo AUV: 1.536 m long, 135.63 mm diameter hull, rounded nose (+x),
 # pointed tail. Origin is the hull midpoint (768 mm from either tip).
+# Horizontal thrusters sit on a crossbar at the hull midpoint.
 #
 # Mass, CG/CB, inertia, drag and added mass are ESTIMATES from the hull
 # geometry (uniform-density cylinder, slender-body theory). Replace with
@@ -48,10 +49,10 @@ drag:
 # Added mass is set as <fluid_added_mass> in model.sdf.in, not via the
 # Hydrodynamics plugin (added_mass here defaults to 0).
 thrusters:
-  - x: -0.533 # Thruster 1: starboard horizontal (235 mm from tail tip, 330 mm span)
+  - x: 0.0 # Thruster 1: starboard horizontal (hull midpoint, 330 mm span)
     y: -0.165
     z: 0.0
-  - x: -0.533 # Thruster 2: port horizontal
+  - x: 0.0 # Thruster 2: port horizontal
     y: 0.165
     z: 0.0
   - x: 0.5648 # Thruster 3: bow vertical (203.2 mm from nose tip)
