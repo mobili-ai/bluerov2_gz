@@ -51,7 +51,8 @@
            rate). Not a real sensor: ma_sensor_sim uses it to render the water column. -->
       <sensor name="water_depth_camera" type="depth_camera">
         <pose>0.21 0 0.05 0 0 0</pose>
-        <topic>/camera/depth</topic>
+        <!-- Not under /camera/: gz derives <topic dir>/camera_info, which would collide with the RGB camera's. -->
+        <topic>/water_depth_camera/depth</topic>
         <update_rate>15</update_rate>
         <always_on>false</always_on>
         <visualize>false</visualize>
