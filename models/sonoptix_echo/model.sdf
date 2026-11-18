@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+<sdf version="1.9">
+  <model name="sonoptix_echo">
+    <!-- Datasheet: https://bluerobotics.com/store/sonars/imaging-sonars/sonoptix-echo/
+         150 x 100 x 42 mm, 750 g in air. Frame is FLU with the acoustic center at the origin. -->
+    <link name="base_link">
+      <inertial>
+        <mass>0.75</mass>
+        <inertia>
+          <ixx>0.00074</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.00152</iyy>
+          <iyz>0</iyz>
+          <izz>0.00203</izz>
+        </inertia>
+      </inertial>
+
+      <visual name="housing">
+        <pose>-0.075 0 0 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.15 0.10 0.042</size>
+          </box>
+        </geometry>
+        <material>
+          <ambient>0.15 0.15 0.17 1</ambient>
+          <diffuse>0.25 0.25 0.28 1</diffuse>
+          <specular>0.4 0.4 0.4 1</specular>
+        </material>
+      </visual>
+      <visual name="transducer_face">
+        <pose>0.001 0 0 0 1.5708 0</pose>
+        <geometry>
+          <box>
+            <size>0.034 0.09 0.002</size>
+          </box>
+        </geometry>
+        <material>
+          <ambient>0.05 0.05 0.05 1</ambient>
+          <diffuse>0.08 0.08 0.08 1</diffuse>
+        </material>
+      </visual>
+
+      <collision name="housing_collision">
+        <pose>-0.075 0 0 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.15 0.10 0.042</size>
+          </box>
+        </geometry>
+      </collision>
+
+      <!-- 256 horizontal samples match the 256 beams (0.47 deg spacing over 120 deg).
+           Vertical samples integrate the 20 deg elevation aperture, which the sonar
+           cannot resolve; the sim node collapses them into range bins. -->
+      <sensor name="echo_rays" type="gpu_lidar">
+        <gz_frame_id>sonar_echo_link</gz_frame_id>
+        <topic>/sonar/echo/rays</topic>
+        <update_rate>15</update_rate>
+        <always_on>true</always_on>
+        <visualize>false</visualize>
+        <lidar>
+          <scan>
+            <horizontal>
+              <samples>256</samples>
+              <resolution>1</resolution>
+              <min_angle>-1.0472</min_angle>
+              <max_angle>1.0472</max_angle>
+            </horizontal>
+            <vertical>
+              <samples>48</samples>
+              <resolution>1</resolution>
+              <min_angle>-0.17453</min_angle>
+              <max_angle>0.17453</max_angle>
+            </vertical>
+          </scan>
+          <range>
+            <min>0.2</min>
+            <max>30.0</max>
+            <resolution>0.008</resolution>
+          </range>
+        </lidar>
+      </sensor>
+    </link>
+  </model>
+</sdf>

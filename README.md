@@ -33,6 +33,9 @@ where `<gazebo-world-file>` should be replaced with:
 * `bluerov2_underwater.world` for the BlueROV2 base configuration
 * `bluerov2_heavy_underwater.world` for the BlueROV2 Heavy configuration
 * `bluerov2_ping.world` for a BlueROV2 base with a Ping sonar
+* `nns_shipyard.world` for the BlueROV2 Heavy (with Sonoptix ECHO) at a real-scale,
+  approximate Newport News Shipbuilding waterfront. This file and `models/nns_shipyard/`
+  are generated: edit and re-run `scripts/generate_nns_world.py` instead.
 
 Once Gazebo has been launched, you can directly send thrust commands to the BlueROV2
 model in Gazebo:

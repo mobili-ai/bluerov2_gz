@@ -47,6 +47,28 @@
         <update_rate>1000.0</update_rate>
       </sensor>
 
+      <!-- Co-located with segmentation_camera's RGB camera (same pose, FOV, resolution,
+           rate). Not a real sensor: ma_sensor_sim uses it to render the water column. -->
+      <sensor name="water_depth_camera" type="depth_camera">
+        <pose>0.21 0 0.05 0 0 0</pose>
+        <topic>/camera/depth</topic>
+        <update_rate>15</update_rate>
+        <always_on>false</always_on>
+        <visualize>false</visualize>
+        <camera>
+          <horizontal_fov>1.57</horizontal_fov>
+          <image>
+            <width>640</width>
+            <height>480</height>
+            <format>R_FLOAT32</format>
+          </image>
+          <clip>
+            <near>0.1</near>
+            <far>100</far>
+          </clip>
+        </camera>
+      </sensor>
+
     </link>
 
     <!-- Hydrodynamics plugin -->
@@ -98,6 +120,19 @@
     <joint name="segmentation_camera_fixed_joint" type="fixed">
       <parent>base_link</parent>
       <child>segmentation_camera::base_link</child>
+    </joint>
+
+    <!-- Sonoptix ECHO under the front of the frame, 5 deg down-tilt as on the Blue Robotics
+         bracket. Keep in sync with MOUNT in ma_sensor_sim/launch/sonoptix_echo_sim.launch.py. -->
+    <include>
+      <uri>model://sonoptix_echo</uri>
+      <name>sonoptix_echo</name>
+      <pose>0.24 0 -0.06 0 0.0873 0</pose>
+    </include>
+
+    <joint name="sonoptix_echo_fixed_joint" type="fixed">
+      <parent>base_link</parent>
+      <child>sonoptix_echo::base_link</child>
     </joint>
 
     <link name="thruster1">
